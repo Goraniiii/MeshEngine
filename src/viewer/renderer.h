@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../mesh/mesh.h"
+#include "camera.h"
 #include <glad/glad.h>
 
 class Renderer
@@ -8,13 +9,21 @@ class Renderer
 public:
 
     void uploadMesh(const Mesh& mesh);
-    void draw();
+    void draw(int width, int height);
+
+    void initShader();
+
+    Camera camera;
 
 private:
 
-    unsigned int VAO = 0;
-    unsigned int VBO = 0;
-    unsigned int EBO = 0;
+    GLuint VAO;
+    GLuint VBO;
+    GLuint EBO;
 
-    int indexCount = 0;
+    GLuint shaderProgram;
+
+    GLuint mvpLocation;
+
+    int indexCount;
 };

@@ -40,14 +40,71 @@ void Renderer::uploadMesh(const Mesh& mesh)
     glBindVertexArray(0);
 }
 
-void Renderer::draw()
+void Renderer::draw(int width, int height)
 {
+    float aspect = (float)width / height;
+
+    Eigen::Matrix4f view = camera.getViewMatrix();
+    Eigen::Matrix4f proj = camera.getProjectionMatrix(aspect);
+
+    Eigen::Matrix4f MVP = proj * view;
+
+    glUniformMatrix4fv(
+        mvpLocation,
+        1,
+        GL_FALSE,
+        MVP.data()
+    );
+
     glBindVertexArray(VAO);
 
-    glDrawElements(
-        GL_TRIANGLES,
-        indexCount,
-        GL_UNSIGNED_INT,
-        0
-    );
+    glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+}
+
+void Renderer::initShader()
+{
+    const char* vsSrc = R"(
+
+    #version 330 core
+    layout(location=0) in vec3 position;
+
+    uniform mat4 MVP;
+
+    void main()
+    {
+        gl_Position = MVP * vec4(position,1.0);
+    }
+
+    )";
+
+    const char* fsSrc = R"(
+
+    #version 330 core
+    out vec4 FragColor;
+
+    void main()
+    {
+        FragColor = vec4(0.8,0.8,0.8,1.0);
+    }
+
+    )";
+
+    GLuint vs = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vs, 1, &vsSrc, nullptr);
+    glCompileShader(vs);
+
+    GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fs, 1, &fsSrc, nullptr);
+    glCompileShader(fs);
+
+    shaderProgram = glCreateProgram();
+
+    glAttachShader(shaderProgram, vs);
+    glAttachShader(shaderProgram, fs);
+    glLinkProgram(shaderProgram);
+
+    glDeleteShader(vs);
+    glDeleteShader(fs);
+
+    mvpLocation = glGetUniformLocation(shaderProgram, "MVP");
 }

@@ -5,6 +5,16 @@
 #include "mesh/obj_loader.h"
 #include "viewer/renderer.h"
 
+Renderer* gRenderer = nullptr;
+
+double lastX = 0;
+double lastY = 0;
+bool dragging = false;
+
+void mouseButton(GLFWwindow* window, int button, int action, int mods);
+void cursorPos(GLFWwindow* window, double x, double y);
+void scroll(GLFWwindow* window, double xoffset, double yoffset);
+
 int main()
 {
     if (!glfwInit())
@@ -13,7 +23,7 @@ int main()
         return -1;
     }
 
-    GLFWwindow* window = glfwCreateWindow(1600, 1200, "MeshEngine", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(800, 600, "MeshEngine", NULL, NULL);
 
     if (!window)
     {
@@ -30,7 +40,8 @@ int main()
         return -1;
     }
 
-    // 이제 OpenGL 사용 가능
+    glEnable(GL_DEPTH_TEST);
+
     Mesh mesh;
     LoadOBJ("C:\\Users\\gony4\\source\\repos\\MeshEngine\\assets\\mesh\\teapot.obj", mesh);
 
@@ -38,17 +49,73 @@ int main()
     std::cout << "Indices: " << mesh.indices.size() << std::endl;
 
     Renderer renderer;
+    renderer.initShader();
     renderer.uploadMesh(mesh);
+
+    gRenderer = &renderer;
+
+    glfwSetMouseButtonCallback(window, mouseButton);
+    glfwSetCursorPosCallback(window, cursorPos);
+    glfwSetScrollCallback(window, scroll);
 
     while (!glfwWindowShouldClose(window))
     {
+        int width, height;
+        glfwGetFramebufferSize(window, &width, &height);
+
+        glViewport(0, 0, width, height);
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        renderer.draw();
+        renderer.draw(width, height);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
     glfwTerminate();
+}
+
+void mouseButton(GLFWwindow* window, int button, int action, int mods)
+{
+    if (button == GLFW_MOUSE_BUTTON_LEFT)
+    {
+        if (action == GLFW_PRESS)
+        {
+            dragging = true;
+
+            glfwGetCursorPos(window, &lastX, &lastY);
+        }
+        else if (action == GLFW_RELEASE)
+        {
+            dragging = false;
+        }
+    }
+}
+
+void cursorPos(GLFWwindow* window, double x, double y)
+{
+    if (!dragging)
+    {
+        lastX = x;
+        lastY = y;
+        return;
+    }
+
+    float dx = x - lastX;
+    float dy = y - lastY;
+
+    gRenderer->camera.yaw += dx * 0.01f;
+    gRenderer->camera.pitch += dy * 0.01f;
+
+    lastX = x;
+    lastY = y;
+}
+
+void scroll(GLFWwindow* window, double xoffset, double yoffset)
+{
+    gRenderer->camera.distance -= yoffset * 0.5f;
+
+    if (gRenderer->camera.distance < 1.0f)
+        gRenderer->camera.distance = 1.0f;
 }

@@ -12,8 +12,7 @@ set(CMAKE_CXX_STANDARD 17)
 add_subdirectory(third_party/glfw)
 
 add_library(glad
-    third_party/glad/src/glad.c
-)
+    third_party/glad/src/glad.c)
 
 target_include_directories(glad PUBLIC
     third_party/glad/include
@@ -21,12 +20,14 @@ target_include_directories(glad PUBLIC
 
 # 이 프로젝트의 실행 파일에 소스를 추가합니다.
 add_executable (MeshEngine   
-    "src/main.cpp" 
-    "src/viewer/renderer.cpp" 
-    "src/viewer/renderer.h" 
-    "src/mesh/mesh.h" 
-    "src/mesh/obj_loader.h" 
-    "src/mesh/obj_loader.cpp"
+"src/main.cpp" 
+"src/viewer/renderer.cpp" 
+"src/viewer/renderer.h" 
+"src/mesh/mesh.h" 
+"src/mesh/obj_loader.h" 
+"src/mesh/obj_loader.cpp"
+"src/viewer/camera.h"
+"src/viewer/camera.cpp"
 )
 
 target_include_directories(MeshEngine PRIVATE
