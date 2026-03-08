@@ -15,6 +15,8 @@ public:
 
     Camera camera;
 
+    bool wireframe = false;
+
 private:
 
     GLuint VAO;
@@ -26,4 +28,5 @@ private:
     GLuint mvpLocation;
 
     int indexCount;
+
 };

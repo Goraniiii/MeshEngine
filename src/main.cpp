@@ -14,6 +14,7 @@ bool dragging = false;
 void mouseButton(GLFWwindow* window, int button, int action, int mods);
 void cursorPos(GLFWwindow* window, double x, double y);
 void scroll(GLFWwindow* window, double xoffset, double yoffset);
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 int main()
 {
@@ -48,6 +49,20 @@ int main()
     std::cout << "Vertices: " << mesh.vertices.size() << std::endl;
     std::cout << "Indices: " << mesh.indices.size() << std::endl;
 
+    Eigen::Vector3f center(0, 0, 0);
+
+    for (const auto& v : mesh.vertices)
+    {
+        center += v;
+    }
+
+    center /= mesh.vertices.size();
+
+    for (auto& v : mesh.vertices)
+    {
+        v -= center;
+    }
+
     Renderer renderer;
     renderer.initShader();
     renderer.uploadMesh(mesh);
@@ -57,6 +72,7 @@ int main()
     glfwSetMouseButtonCallback(window, mouseButton);
     glfwSetCursorPosCallback(window, cursorPos);
     glfwSetScrollCallback(window, scroll);
+    glfwSetKeyCallback(window, keyCallback);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -123,4 +139,15 @@ void scroll(GLFWwindow* window, double xoffset, double yoffset)
     if (gRenderer->camera.distance < 1.0f)
         gRenderer->camera.distance = 1.0f;
 
+}
+
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (action == GLFW_PRESS)
+    {
+        if (key == GLFW_KEY_W)
+        {
+            gRenderer->wireframe = !gRenderer->wireframe;
+        }
+    }
 }

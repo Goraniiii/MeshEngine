@@ -42,6 +42,13 @@ void Renderer::uploadMesh(const Mesh& mesh)
 
 void Renderer::draw(int width, int height)
 {
+    glUseProgram(shaderProgram);
+
+    if (wireframe)
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    else
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
     float aspect = (float)width / height;
 
     Eigen::Matrix4f view = camera.getViewMatrix();
@@ -49,7 +56,6 @@ void Renderer::draw(int width, int height)
 
     Eigen::Matrix4f MVP = proj * view;
 
-    glUseProgram(shaderProgram);
 
     glUniformMatrix4fv(
         mvpLocation,

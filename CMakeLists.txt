@@ -45,4 +45,3 @@ target_link_libraries(MeshEngine
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET MeshEngine PROPERTY CXX_STANDARD 20)
 endif()
-
