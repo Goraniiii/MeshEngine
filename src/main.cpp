@@ -96,17 +96,21 @@ void mouseButton(GLFWwindow* window, int button, int action, int mods)
 void cursorPos(GLFWwindow* window, double x, double y)
 {
     if (!dragging)
-    {
-        lastX = x;
-        lastY = y;
         return;
-    }
 
     float dx = x - lastX;
     float dy = y - lastY;
 
-    gRenderer->camera.yaw += dx * 0.01f;
-    gRenderer->camera.pitch += dy * 0.01f;
+    float sensitivity = 0.005f;
+
+    gRenderer->camera.yaw += dx * sensitivity;
+    gRenderer->camera.pitch += dy * sensitivity;
+
+    if (gRenderer->camera.pitch > 1.5f)
+        gRenderer->camera.pitch = 1.5f;
+
+    if (gRenderer->camera.pitch < -1.5f)
+        gRenderer->camera.pitch = -1.5f;
 
     lastX = x;
     lastY = y;
@@ -118,4 +122,5 @@ void scroll(GLFWwindow* window, double xoffset, double yoffset)
 
     if (gRenderer->camera.distance < 1.0f)
         gRenderer->camera.distance = 1.0f;
+
 }

@@ -49,6 +49,8 @@ void Renderer::draw(int width, int height)
 
     Eigen::Matrix4f MVP = proj * view;
 
+    glUseProgram(shaderProgram);
+
     glUniformMatrix4fv(
         mvpLocation,
         1,
