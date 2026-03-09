@@ -1,4 +1,5 @@
 #include "obj_loader.h"
+#include "../mesh/mesh.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
@@ -31,13 +32,25 @@ bool LoadOBJ(const std::string& filename, Mesh& mesh)
     {
         for (const auto& index : shape.mesh.indices)
         {
-            Eigen::Vector3f v;
+            Eigen::Vector3f position(
+                attrib.vertices[3 * index.vertex_index + 0],
+                attrib.vertices[3 * index.vertex_index + 1],
+                attrib.vertices[3 * index.vertex_index + 2]
+            );
 
-            v.x() = attrib.vertices[3 * index.vertex_index + 0];
-            v.y() = attrib.vertices[3 * index.vertex_index + 1];
-            v.z() = attrib.vertices[3 * index.vertex_index + 2];
+            Eigen::Vector3f normal(0, 0, 1);
 
-            mesh.vertices.push_back(v);
+            if (index.normal_index >= 0)
+            {
+                normal = Eigen::Vector3f(
+                    attrib.normals[3 * index.normal_index + 0],
+                    attrib.normals[3 * index.normal_index + 1],
+                    attrib.normals[3 * index.normal_index + 2]
+                );
+            }
+
+            mesh.vertices.emplace_back(position, normal);
+
             mesh.indices.push_back(mesh.indices.size());
         }
     }

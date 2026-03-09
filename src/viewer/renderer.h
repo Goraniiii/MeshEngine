@@ -8,25 +8,28 @@ class Renderer
 {
 public:
 
+    void init();
     void uploadMesh(const Mesh& mesh);
     void draw(int width, int height);
 
-    void initShader();
+    bool wireframe = false;
 
     Camera camera;
 
-    bool wireframe = false;
-
 private:
 
-    GLuint VAO;
-    GLuint VBO;
-    GLuint EBO;
+    void initShader();
 
-    GLuint shaderProgram;
+    GLuint VAO = 0;
+    GLuint VBO = 0;
+    GLuint EBO = 0;
 
-    GLuint mvpLocation;
+    GLuint shaderProgram = 0;
 
-    int indexCount;
+    GLuint mvpLocation = -1;
+    GLuint mvLocation = -1;
+    GLuint normalMatrixLocation = -1;
+    GLuint wireframeLocation = -1;
 
+    int indexCount = 0;
 };

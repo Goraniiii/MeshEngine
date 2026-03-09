@@ -41,38 +41,61 @@ int main()
         return -1;
     }
 
-    glEnable(GL_DEPTH_TEST);
+    // -----------------------
+    // Mesh load
+    // -----------------------
 
     Mesh mesh;
-    LoadOBJ("C:\\Users\\gony4\\source\\repos\\MeshEngine\\assets\\mesh\\teapot.obj", mesh);
+
+    LoadOBJ(
+        "C:\\Users\\gony4\\source\\repos\\MeshEngine\\assets\\mesh\\teapot.obj",
+        mesh
+    );
 
     std::cout << "Vertices: " << mesh.vertices.size() << std::endl;
     std::cout << "Indices: " << mesh.indices.size() << std::endl;
+
+    // -----------------------
+    // Center mesh
+    // -----------------------
 
     Eigen::Vector3f center(0, 0, 0);
 
     for (const auto& v : mesh.vertices)
     {
-        center += v;
+        center += v.position;
     }
 
     center /= mesh.vertices.size();
 
     for (auto& v : mesh.vertices)
     {
-        v -= center;
+        v.position -= center;
     }
 
+    // -----------------------
+    // Renderer
+    // -----------------------
+
     Renderer renderer;
-    renderer.initShader();
+
+    renderer.init();
     renderer.uploadMesh(mesh);
 
     gRenderer = &renderer;
+
+    // -----------------------
+    // Input callbacks
+    // -----------------------
 
     glfwSetMouseButtonCallback(window, mouseButton);
     glfwSetCursorPosCallback(window, cursorPos);
     glfwSetScrollCallback(window, scroll);
     glfwSetKeyCallback(window, keyCallback);
+
+    // -----------------------
+    // Render loop
+    // -----------------------
 
     while (!glfwWindowShouldClose(window))
     {
@@ -81,8 +104,6 @@ int main()
 
         glViewport(0, 0, width, height);
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         renderer.draw(width, height);
 
         glfwSwapBuffers(window);
@@ -90,6 +111,7 @@ int main()
     }
 
     glfwTerminate();
+    return 0;
 }
 
 void mouseButton(GLFWwindow* window, int button, int action, int mods)
@@ -99,7 +121,6 @@ void mouseButton(GLFWwindow* window, int button, int action, int mods)
         if (action == GLFW_PRESS)
         {
             dragging = true;
-
             glfwGetCursorPos(window, &lastX, &lastY);
         }
         else if (action == GLFW_RELEASE)
@@ -138,7 +159,6 @@ void scroll(GLFWwindow* window, double xoffset, double yoffset)
 
     if (gRenderer->camera.distance < 1.0f)
         gRenderer->camera.distance = 1.0f;
-
 }
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
