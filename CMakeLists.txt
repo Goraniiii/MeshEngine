@@ -28,17 +28,39 @@ add_executable (MeshEngine
 "src/mesh/obj_loader.cpp"
 "src/viewer/camera.h"
 "src/viewer/camera.cpp"
+"src/mesh/mesh.cpp" 
+"src/mesh/half_edge.h"
+ "src/mesh/half_edge.cpp")
+
+add_library(imgui
+    third_party/imgui/imgui.cpp
+    third_party/imgui/imgui_draw.cpp
+    third_party/imgui/imgui_tables.cpp
+    third_party/imgui/imgui_widgets.cpp
+    third_party/imgui/backends/imgui_impl_glfw.cpp
+    third_party/imgui/backends/imgui_impl_opengl3.cpp
 )
+
+target_include_directories(imgui PUBLIC
+    third_party/imgui
+    third_party/imgui/backends
+)
+
+target_link_libraries(imgui PUBLIC glfw)
 
 target_include_directories(MeshEngine PRIVATE
     third_party/glad/include
     third_party/tinyobjloader
     third_party/eigen
+    third_party/imgui
+    third_party/imgui/backends
 )
+
 
 target_link_libraries(MeshEngine
     glfw
     glad
+    imgui
     opengl32
 )
 

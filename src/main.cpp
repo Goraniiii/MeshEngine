@@ -4,6 +4,7 @@
 
 #include "mesh/obj_loader.h"
 #include "viewer/renderer.h"
+#include "mesh/half_edge.h"
 
 Renderer* gRenderer = nullptr;
 
@@ -54,6 +55,13 @@ int main()
 
     std::cout << "Vertices: " << mesh.vertices.size() << std::endl;
     std::cout << "Indices: " << mesh.indices.size() << std::endl;
+
+    // -----------------------
+    // Half Edge mesh
+    // -----------------------
+    HEMesh hemesh;
+    hemesh.buildFromMesh(mesh);
+    mesh = hemesh.toMesh();
 
     // -----------------------
     // Center mesh
