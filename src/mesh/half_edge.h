@@ -2,7 +2,7 @@
 #include <Eigen/Dense>
 #include "mesh.h"
 
-struct HalfEdge {
+struct HalfEdge {   // index based
     int targetVertex = -1;
     int next = -1;
     int twin = -1;
