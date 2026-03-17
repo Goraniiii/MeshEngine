@@ -4,6 +4,7 @@
 #include "tiny_obj_loader.h"
 
 #include <iostream>
+#include <unordered_map>
 
 bool LoadOBJ(const std::string& filename, Mesh& mesh)
 {
@@ -27,30 +28,37 @@ bool LoadOBJ(const std::string& filename, Mesh& mesh)
 
     if (!ret) return false;
 
+    std::unordered_map<int, unsigned int> uniqueVertices;
+
     for (const auto& shape : shapes)
     {
         for (const auto& index : shape.mesh.indices)
         {
-            Eigen::Vector3f position(
-                attrib.vertices[3 * index.vertex_index + 0],
-                attrib.vertices[3 * index.vertex_index + 1],
-                attrib.vertices[3 * index.vertex_index + 2]
-            );
-
-            Eigen::Vector3f normal(0, 0, 1);
-
-            if (index.normal_index >= 0)
+            if (uniqueVertices.find(index.vertex_index) == uniqueVertices.end())
             {
-                normal = Eigen::Vector3f(
-                    attrib.normals[3 * index.normal_index + 0],
-                    attrib.normals[3 * index.normal_index + 1],
-                    attrib.normals[3 * index.normal_index + 2]
+                // 2. 처음 보는 정점이면 추가
+                Eigen::Vector3f position(
+                    attrib.vertices[3 * index.vertex_index + 0],
+                    attrib.vertices[3 * index.vertex_index + 1],
+                    attrib.vertices[3 * index.vertex_index + 2]
                 );
+
+                Eigen::Vector3f normal(0, 0, 1);
+                if (index.normal_index >= 0)
+                {
+                    normal = Eigen::Vector3f(
+                        attrib.normals[3 * index.normal_index + 0],
+                        attrib.normals[3 * index.normal_index + 1],
+                        attrib.normals[3 * index.normal_index + 2]
+                    );
+                }
+
+                uniqueVertices[index.vertex_index] = (unsigned int)mesh.vertices.size();
+                mesh.vertices.emplace_back(position, normal);
             }
 
-            mesh.vertices.emplace_back(position, normal);
-
-            mesh.indices.push_back(mesh.indices.size());
+            // 3. 맵에 저장된 인덱스를 사용 (중복된 정점이라도 같은 인덱스를 가리키게 됨)
+            mesh.indices.push_back(uniqueVertices[index.vertex_index]);
         }
     }
 

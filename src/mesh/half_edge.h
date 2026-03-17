@@ -28,4 +28,8 @@ public:
 
     void buildFromMesh(const Mesh& mesh);
     Mesh toMesh() const;
+
+    void traverseNeighbors(int v_idx);
+
+    Eigen::Vector3f HEMesh::computeFaceNormal(int f_idx) const;
 };

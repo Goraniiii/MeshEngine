@@ -1,5 +1,7 @@
 #include "half_edge.h"
 
+#include <iostream>
+
 void HEMesh::buildFromMesh(const Mesh& mesh) {
     vertices.clear();
     halfEdges.clear();
@@ -32,20 +34,32 @@ void HEMesh::buildFromMesh(const Mesh& mesh) {
             he.targetVertex = v_next;
             he.face = face_idx;
             he.next = start_he_idx + ((j + 1) % 3);
+            he.twin = -1;  // 초기화 명시
 
-            vertices[v_curr].halfEdge = start_he_idx + j;
+            if (vertices[v_curr].halfEdge == -1) {
+                vertices[v_curr].halfEdge = start_he_idx + j;
+            }
+
+            int current_he_idx = (int)halfEdges.size();
+            halfEdges.push_back(he);
 
             auto twinKey = std::make_pair(v_next, v_curr);
             if (edgeMap.find(twinKey) != edgeMap.end()) {
                 int twin_idx = edgeMap[twinKey];
+
                 he.twin = twin_idx;
-                halfEdges[twin_idx].twin = start_he_idx + j;
+                halfEdges[twin_idx].twin = current_he_idx;
             }
 
-            edgeMap[std::make_pair(v_curr, v_next)] = start_he_idx + j;
-            halfEdges.push_back(he);
+            edgeMap[std::make_pair(v_curr, v_next)] = current_he_idx;
         }
     }
+
+    int twinCount = 0;
+    for (const auto& he : halfEdges) {
+        if (he.twin != -1) twinCount++;
+    }
+    std::cout << "Total HalfEdges: " << halfEdges.size() << ", Connected Twins: " << twinCount << std::endl;
 }
 
 Mesh HEMesh::toMesh() const {
@@ -79,3 +93,47 @@ Mesh HEMesh::toMesh() const {
 
     return result;
 }
+
+void HEMesh::traverseNeighbors(int v_idx) {
+    int startEdge = vertices[v_idx].halfEdge;
+    if (startEdge == -1) { return; }    // 연결된 edge가 없는 case
+
+    int curr = startEdge;
+    do {
+        // 1. face
+        int f_idx = halfEdges[curr].face;
+        if (f_idx != -1) {
+            std::cout << "visited face: " << f_idx << std::endl;
+        }
+
+        // 2. neighbor vertex
+        int neighbor_v = halfEdges[curr].targetVertex;
+        std::cout << "neighbor vertex: " << neighbor_v << std::endl;
+
+        // 3. next edge
+        int twin_idx = halfEdges[curr].twin;
+        if (twin_idx == -1) { break; }
+
+        curr = halfEdges[twin_idx].next;
+
+    } while (curr != startEdge);
+}
+
+Eigen::Vector3f HEMesh::computeFaceNormal(int f_idx) const {
+    int e0 = faces[f_idx].halfEdge;
+    int e1 = halfEdges[e0].next;
+    int e2 = halfEdges[e1].next;
+
+    // position (e2->v0, e0->v1, e1->v2)
+    const Eigen::Vector3f& v0 = vertices[halfEdges[e2].targetVertex].position;
+    const Eigen::Vector3f& v1 = vertices[halfEdges[e0].targetVertex].position;
+    const Eigen::Vector3f& v2 = vertices[halfEdges[e1].targetVertex].position;
+
+    Eigen::Vector3f side1 = v1 - v0;
+    Eigen::Vector3f side2 = v2 - v0;
+
+    Eigen::Vector3f normal = side1.cross(side2).normalized(); // 외적 후 정규화
+
+    return normal;
+}
+
