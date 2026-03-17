@@ -7,7 +7,9 @@ endif()
 
 project ("MeshEngine")
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_subdirectory(third_party/glfw)
 
@@ -64,6 +66,3 @@ target_link_libraries(MeshEngine
     opengl32
 )
 
-if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET MeshEngine PROPERTY CXX_STANDARD 20)
-endif()

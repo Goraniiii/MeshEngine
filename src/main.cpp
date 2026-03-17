@@ -61,7 +61,10 @@ int main()
     // -----------------------
     HEMesh hemesh;
     hemesh.buildFromMesh(mesh);
+    hemesh.updateVertexNormals();
     mesh = hemesh.toMesh();
+
+    hemesh.traverseNeighbors(100);
 
     // -----------------------
     // Center mesh

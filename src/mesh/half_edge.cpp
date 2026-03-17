@@ -137,3 +137,26 @@ Eigen::Vector3f HEMesh::computeFaceNormal(int f_idx) const {
     return normal;
 }
 
+void HEMesh::updateVertexNormals() {
+    for (int i = 0; i < vertices.size(); ++i) {
+        Eigen::Vector3f avgNormal(0, 0, 0);
+
+        int startEdge = vertices[i].halfEdge;
+        if (startEdge == -1) { continue; }
+
+        int curr = startEdge;
+        do {
+            if (halfEdges[curr].face != -1) {
+                avgNormal += computeFaceNormal(halfEdges[curr].face);
+            }
+
+            int prev_he = halfEdges[halfEdges[curr].next].next;
+            curr = halfEdges[prev_he].twin;
+
+            if (curr == -1) { break; }
+
+        } while (curr != startEdge);
+
+        vertices[i].normal = avgNormal.normalized();
+    }
+}

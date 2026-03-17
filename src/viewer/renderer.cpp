@@ -112,7 +112,7 @@ void Renderer::initShader()
     uniform mat4 MV;
     uniform mat3 normalMatrix;
 
-    flat out vec3 vNormal;
+    out vec3 vNormal;
     out vec3 vPosition;
 
     void main()
@@ -131,7 +131,7 @@ void Renderer::initShader()
 
     #version 330 core
 
-    flat in vec3 vNormal;
+    in vec3 vNormal;
     in vec3 vPosition;
 
     out vec4 FragColor;

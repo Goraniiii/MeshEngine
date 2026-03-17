@@ -31,5 +31,6 @@ public:
 
     void traverseNeighbors(int v_idx);
 
-    Eigen::Vector3f HEMesh::computeFaceNormal(int f_idx) const;
+    Eigen::Vector3f computeFaceNormal(int f_idx) const;
+    void updateVertexNormals();
 };
