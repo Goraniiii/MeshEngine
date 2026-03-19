@@ -31,9 +31,12 @@ public:
 
     void traverseNeighbors(int v_idx);
 
+    // Compute Normal
     Eigen::Vector3f computeFaceNormal(int f_idx) const;
     void updateVertexNormals();
 
     // Laplacian Smoothing
-    void smooth(float lambda, int iterations);
+    void applyLaplacian(float lambda);
+    void smoothLaplacian(float lambda, int iterations);
+    void smoothTaubin(float lambda, float mu, int iterations);
 };
