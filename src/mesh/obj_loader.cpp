@@ -36,7 +36,7 @@ bool LoadOBJ(const std::string& filename, Mesh& mesh)
         {
             if (uniqueVertices.find(index.vertex_index) == uniqueVertices.end())
             {
-                // 2. 처음 보는 정점이면 추가
+                // 처음 보는 정점이면 추가
                 Eigen::Vector3f position(
                     attrib.vertices[3 * index.vertex_index + 0],
                     attrib.vertices[3 * index.vertex_index + 1],
@@ -57,7 +57,7 @@ bool LoadOBJ(const std::string& filename, Mesh& mesh)
                 mesh.vertices.emplace_back(position, normal);
             }
 
-            // 3. 맵에 저장된 인덱스를 사용 (중복된 정점이라도 같은 인덱스를 가리키게 됨)
+            // 맵에 저장된 인덱스 사용
             mesh.indices.push_back(uniqueVertices[index.vertex_index]);
         }
     }

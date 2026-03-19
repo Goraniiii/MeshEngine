@@ -33,4 +33,7 @@ public:
 
     Eigen::Vector3f computeFaceNormal(int f_idx) const;
     void updateVertexNormals();
+
+    // Laplacian Smoothing
+    void smooth(float lambda, int iterations);
 };

@@ -160,3 +160,50 @@ void HEMesh::updateVertexNormals() {
         vertices[i].normal = avgNormal.normalized();
     }
 }
+
+void HEMesh::smooth(float lambda, int iterations) {
+    for (int iter = 0; iter < iterations; ++iter) {
+        // Double Buffering
+        std::vector<Eigen::Vector3f> newPositions(vertices.size());
+
+        for (int i = 0; i < vertices.size(); ++i) {
+            int startEdge = vertices[i].halfEdge;
+            if (startEdge == -1) {
+                newPositions[i] = vertices[i].position;
+                continue;
+            }
+
+            Eigen::Vector3f sumNeighborPos(0, 0, 0);
+            int neighborCount = 0;
+
+            // Half-Edge traverse
+            int curr = startEdge;
+            do {
+                int neighborIdx = halfEdges[curr].targetVertex;
+                sumNeighborPos += vertices[neighborIdx].position;
+                neighborCount++;
+
+                int prevEdge = halfEdges[halfEdges[curr].next].next;
+                curr = halfEdges[prevEdge].twin;
+
+                if (curr == -1) { break; }
+
+            } while (curr != startEdge);
+
+            if (neighborCount > 0) {
+                Eigen::Vector3f averagePos = sumNeighborPos / (float)neighborCount;
+                newPositions[i] = vertices[i].position + lambda * (averagePos - vertices[i].position);
+            }
+            else {
+                newPositions[i] = vertices[i].position;
+            }
+        }
+           
+        // update positions
+        for (int i = 0; i < vertices.size(); ++i) {
+            vertices[i].position = newPositions[i];
+        }
+    }
+
+    updateVertexNormals();
+}

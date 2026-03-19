@@ -12,10 +12,15 @@ double lastX = 0;
 double lastY = 0;
 bool dragging = false;
 
+Mesh mesh;
+HEMesh hemesh;
+
 void mouseButton(GLFWwindow* window, int button, int action, int mods);
 void cursorPos(GLFWwindow* window, double x, double y);
 void scroll(GLFWwindow* window, double xoffset, double yoffset);
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+void centerMesh(Mesh& mesh);
 
 int main()
 {
@@ -46,10 +51,8 @@ int main()
     // Mesh load
     // -----------------------
 
-    Mesh mesh;
-
     LoadOBJ(
-        "C:\\Users\\gony4\\source\\repos\\MeshEngine\\assets\\mesh\\teapot.obj",
+        "C:\\Users\\gony4\\source\\repos\\MeshEngine\\assets\\mesh\\sphere.obj",
         mesh
     );
 
@@ -59,7 +62,6 @@ int main()
     // -----------------------
     // Half Edge mesh
     // -----------------------
-    HEMesh hemesh;
     hemesh.buildFromMesh(mesh);
     hemesh.updateVertexNormals();
     mesh = hemesh.toMesh();
@@ -70,26 +72,12 @@ int main()
     // Center mesh
     // -----------------------
 
-    Eigen::Vector3f center(0, 0, 0);
-
-    for (const auto& v : mesh.vertices)
-    {
-        center += v.position;
-    }
-
-    center /= mesh.vertices.size();
-
-    for (auto& v : mesh.vertices)
-    {
-        v.position -= center;
-    }
+    centerMesh(mesh);
 
     // -----------------------
     // Renderer
     // -----------------------
-
     Renderer renderer;
-
     renderer.init();
     renderer.uploadMesh(mesh);
 
@@ -176,9 +164,30 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 {
     if (action == GLFW_PRESS)
     {
-        if (key == GLFW_KEY_W)
-        {
+        if (key == GLFW_KEY_W) {
+            // wireframe togle
             gRenderer->wireframe = !gRenderer->wireframe;
         }
+        else if (key == GLFW_KEY_S) {
+            // smoothing
+            hemesh.smooth(0.1f, 1);
+            mesh = hemesh.toMesh();
+            centerMesh(mesh);
+            gRenderer->uploadMesh(mesh);
+        }
+    }
+}
+
+void centerMesh(Mesh& mesh) {
+    if (mesh.vertices.empty()) return;
+
+    Eigen::Vector3f center(0, 0, 0);
+    for (const auto& v : mesh.vertices) {
+        center += v.position;
+    }
+    center /= (float)mesh.vertices.size();
+
+    for (auto& v : mesh.vertices) {
+        v.position -= center;
     }
 }
