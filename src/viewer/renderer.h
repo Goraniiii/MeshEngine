@@ -13,6 +13,7 @@ public:
     void draw(int width, int height);
 
     bool wireframe = false;
+    bool useColor = false;
 
     Camera camera;
 

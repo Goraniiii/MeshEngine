@@ -14,6 +14,8 @@ struct HE_Vertex {
     Eigen::Vector3f position;
     Eigen::Vector3f normal;
     int halfEdge = -1;
+
+    float curvature = 0.0f;
 };
 
 struct HE_Face {
@@ -39,4 +41,7 @@ public:
     void applyLaplacian(float lambda);
     void smoothLaplacian(float lambda, int iterations);
     void smoothTaubin(float lambda, float mu, int iterations);
+
+    // Gaussian Curvature
+    void computeGaussianCurvature();
 };

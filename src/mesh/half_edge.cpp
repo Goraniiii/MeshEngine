@@ -2,6 +2,10 @@
 
 #include <iostream>
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846 // Define M_PI if not already defined
+#endif
+
 void HEMesh::buildFromMesh(const Mesh& mesh) {
     vertices.clear();
     halfEdges.clear();
@@ -64,12 +68,29 @@ void HEMesh::buildFromMesh(const Mesh& mesh) {
 
 Mesh HEMesh::toMesh() const {
     Mesh result;
-     // 1. copy vertices
+
+    float minC = 1e10f;
+    float maxC = -1e10f;
+
+    for (const auto& hev : this->vertices) {
+        minC = std::min(minC, hev.curvature);
+        maxC = std::max(maxC, hev.curvature);
+    }
+
+    float range = maxC - minC;
+    if (range < 1e-6f) range = 1.0f; // ¸ðµç °î·üÀÌ °°À» °æ¿ì ºÐ¸ð 0 ¹æÁö
+
     result.vertices.reserve(this->vertices.size());
     for (const auto& hev : this->vertices) {
         Vertex v;
         v.position = hev.position;
         v.normal = hev.normal;
+
+        // °î·ü Á¤±ÔÈ­ (0.0 ~ 1.0)
+        float t = (hev.curvature - minC) / range;
+
+        v.color = Eigen::Vector3f(t, 0.0f, 1.0f - t);
+
         result.vertices.push_back(v);
     }
 
@@ -220,4 +241,44 @@ void HEMesh::smoothTaubin(float lambda, float mu, int iterations) {
     }
 
     updateVertexNormals();
+}
+
+void HEMesh::computeGaussianCurvature() {
+    for (int i = 0; i < vertices.size(); ++i) {
+        int startEdge = vertices[i].halfEdge;
+        if (startEdge == -1) {
+            vertices[i].curvature = 0.0f;
+            continue;
+        }
+
+        float angleSum = 0.0f;
+        int curr = startEdge;
+
+        do {
+            if (halfEdges[curr].face != -1) {
+                int nextEdge = halfEdges[curr].next;
+
+                Eigen::Vector3f v0 = vertices[i].position;
+                Eigen::Vector3f v1 = vertices[halfEdges[curr].targetVertex].position;
+                Eigen::Vector3f v2 = vertices[halfEdges[nextEdge].targetVertex].position;
+
+                Eigen::Vector3f e1 = (v1 - v0).normalized();
+                Eigen::Vector3f e2 = (v2 - v0).normalized();
+
+                float dot = e1.dot(e2);
+                dot = std::max(-1.0f, std::min(1.0f, dot));
+                angleSum += std::acos(dot);
+            }
+
+            int prevEdge = halfEdges[halfEdges[curr].next].next;
+            curr = halfEdges[prevEdge].twin;
+
+            if (curr == -1) {
+                // boundary
+                break;
+            }
+        } while (curr != startEdge);
+
+        vertices[i].curvature = (2.0f * M_PI) - angleSum;
+    }
 }

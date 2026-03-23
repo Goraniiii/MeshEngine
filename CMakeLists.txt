@@ -32,7 +32,9 @@ add_executable (MeshEngine
 "src/viewer/camera.cpp"
 "src/mesh/mesh.cpp" 
 "src/mesh/half_edge.h"
- "src/mesh/half_edge.cpp")
+"src/mesh/half_edge.cpp"
+"src/viewer/shader.h"
+"src/viewer/shader.cpp")
 
 add_library(imgui
     third_party/imgui/imgui.cpp
@@ -66,3 +68,5 @@ target_link_libraries(MeshEngine
     opengl32
 )
 
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/shaders" 
+     DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")

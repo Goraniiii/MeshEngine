@@ -10,6 +10,8 @@ struct Vertex
     Eigen::Vector3f position;
     Eigen::Vector3f normal;
 
+    Eigen::Vector3f color;
+
     Vertex() {}
 
     Vertex(const Eigen::Vector3f& p, const Eigen::Vector3f& n)

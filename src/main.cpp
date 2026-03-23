@@ -52,7 +52,7 @@ int main()
     // -----------------------
 
     LoadOBJ(
-        "C:\\Users\\gony4\\source\\repos\\MeshEngine\\assets\\mesh\\bunny.obj",
+        "C:\\Users\\gony4\\source\\repos\\MeshEngine\\assets\\mesh\\teapot.obj",
         mesh
     );
 
@@ -180,6 +180,16 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             mesh = hemesh.toMesh();
             centerMesh(mesh);
             gRenderer->uploadMesh(mesh);
+        }
+        else if (key == GLFW_KEY_C) {
+            // toggle
+            gRenderer->useColor = !gRenderer->useColor;
+            if (gRenderer->useColor) {
+                hemesh.computeGaussianCurvature();
+                mesh = hemesh.toMesh();
+                centerMesh(mesh);
+                gRenderer->uploadMesh(mesh);
+            }
         }
     }
 }
