@@ -1,5 +1,5 @@
-#include <map>
 #include <Eigen/Dense>
+#include <vector>
 #include "mesh.h"
 
 struct HalfEdge {   // index based
@@ -41,6 +41,9 @@ public:
     void applyLaplacian(float lambda);
     void smoothLaplacian(float lambda, int iterations);
     void smoothTaubin(float lambda, float mu, int iterations);
+
+    // adaptive Smoothing
+    void smoothAdaptive(float lambda, float sharpnessThres);
 
     // Gaussian Curvature
     void computeGaussianCurvature();

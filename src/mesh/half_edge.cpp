@@ -1,6 +1,7 @@
 #include "half_edge.h"
 
 #include <iostream>
+#include <map>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846 // Define M_PI if not already defined
@@ -280,5 +281,66 @@ void HEMesh::computeGaussianCurvature() {
         } while (curr != startEdge);
 
         vertices[i].curvature = (2.0f * M_PI) - angleSum;
+    }
+}
+
+void HEMesh::smoothAdaptive(float lambda, float sharpnessThreshold) {
+
+    computeGaussianCurvature();
+
+    if (vertices.empty()) { return; }
+
+    // Double Buffering
+    std::vector<Eigen::Vector3f> newPositions(vertices.size());
+
+    // OpenMP º´·ÄÈ­
+    //#pragma omp parallel for
+    for (int i = 0; i < (int)vertices.size(); ++i) {
+        int startEdge = vertices[i].halfEdge;
+
+        if (startEdge == -1) {
+            newPositions[i] = vertices[i].position;
+            continue;
+        }
+
+        Eigen::Vector3f sumNeighborPos(0, 0, 0);
+        int neighborCount = 0;
+        int curr = startEdge;
+        bool isBoundary = false;
+
+        do {
+            int neighborIdx = halfEdges[curr].targetVertex;
+            sumNeighborPos += vertices[neighborIdx].position;
+            neighborCount++;
+
+            int prevEdge = halfEdges[halfEdges[curr].next].next;
+            curr = halfEdges[prevEdge].twin;
+
+            if (curr == -1) {
+                isBoundary = true;
+                break;
+            }
+        } while (curr != startEdge);
+
+        if (neighborCount > 0) {
+            Eigen::Vector3f averagePos = sumNeighborPos / (float)neighborCount;
+            Eigen::Vector3f laplacian = averagePos - vertices[i].position;
+
+            float absCurvature = std::abs(vertices[i].curvature);
+
+            float weight = std::exp(-absCurvature * sharpnessThreshold);
+
+            if (isBoundary) weight *= 0.5f;
+
+            newPositions[i] = vertices[i].position + (lambda * weight * laplacian);
+        }
+        else {
+            newPositions[i] = vertices[i].position;
+        }
+    }
+
+    //#pragma omp parallel for
+    for (int i = 0; i < (int)vertices.size(); ++i) {
+        vertices[i].position = newPositions[i];
     }
 }

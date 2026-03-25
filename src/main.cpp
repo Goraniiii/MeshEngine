@@ -52,7 +52,7 @@ int main()
     // -----------------------
 
     LoadOBJ(
-        "C:\\Users\\gony4\\source\\repos\\MeshEngine\\assets\\mesh\\teapot.obj",
+        "C:\\Users\\gony4\\source\\repos\\MeshEngine\\assets\\mesh\\bunny.obj",
         mesh
     );
 
@@ -177,6 +177,12 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         }
         else if (key == GLFW_KEY_T) {
             hemesh.smoothTaubin(0.1f, -0.11f, 1);
+            mesh = hemesh.toMesh();
+            centerMesh(mesh);
+            gRenderer->uploadMesh(mesh);
+        }
+        else if (key == GLFW_KEY_A) {
+            hemesh.smoothAdaptive(1.0f, 10.0f);
             mesh = hemesh.toMesh();
             centerMesh(mesh);
             gRenderer->uploadMesh(mesh);

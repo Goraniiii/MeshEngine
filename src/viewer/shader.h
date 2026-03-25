@@ -2,6 +2,7 @@
 #define SHADER_H
 
 #include <glad/glad.h>
+
 #include <Eigen/Dense>
 #include <string>
 #include <fstream>

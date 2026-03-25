@@ -1,8 +1,9 @@
 #pragma once
 
+#include <glad/glad.h>
+
 #include "../mesh/mesh.h"
 #include "camera.h"
-#include <glad/glad.h>
 
 class Renderer
 {
