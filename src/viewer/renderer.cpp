@@ -13,7 +13,7 @@ void Renderer::uploadMesh(const Mesh& mesh)
 {
     indexCount = (unsigned int)mesh.indices.size();
 
-    // 기존 VAO/VBO/EBO가 있다면 해제하는 로직이 있으면 좋습니다.
+    // 기존 VAO/VBO/EBO 해제
     if (VAO != 0) {
         glDeleteVertexArrays(1, &VAO);
         glDeleteBuffers(1, &VBO);
@@ -34,7 +34,7 @@ void Renderer::uploadMesh(const Mesh& mesh)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned int), mesh.indices.data(), GL_STATIC_DRAW);
 
-    // 3. Attribute 설정 (location 값은 셰이더와 일치해야 함)
+    // 3. Attribute 설정
     // Position (Location 0)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
     glEnableVertexAttribArray(0);
@@ -43,7 +43,7 @@ void Renderer::uploadMesh(const Mesh& mesh)
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
     glEnableVertexAttribArray(1);
 
-    // Color (Location 2) - 곡률 시각화를 위해 추가
+    // Color (Location 2) - for curvature
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
     glEnableVertexAttribArray(2);
 
@@ -60,7 +60,6 @@ void Renderer::draw(int width, int height)
     else
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-    // 셰이더 사용 시작
     meshShader->use();
 
     float aspect = (float)width / (float)height;

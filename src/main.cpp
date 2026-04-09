@@ -52,7 +52,7 @@ int main()
     // -----------------------
 
     LoadOBJ(
-        "C:\\Users\\gony4\\source\\repos\\MeshEngine\\assets\\mesh\\bunny.obj",
+        "C:\\Users\\gony4\\source\\repos\\MeshEngine\\assets\\mesh\\teapot.obj",
         mesh
     );
 
