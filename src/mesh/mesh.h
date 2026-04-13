@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __MESH__
+#define __MESH__
 
 #include <vector>
 #include <Eigen/Dense>
@@ -22,5 +23,7 @@ struct Vertex
 struct Mesh
 {
     std::vector<Vertex, Eigen::aligned_allocator<Vertex>> vertices;
-    std::vector<unsigned int> indices;
+    std::vector<uint32_t> indices;
 };
+
+#endif

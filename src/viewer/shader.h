@@ -27,7 +27,7 @@ public:
     void setVec3(const std::string& name, const Eigen::Vector3f& vec) const;
 
 private:
-    void checkCompileErrors(unsigned int shader, std::string type);
+    void checkCompileErrors(uint32_t shader, std::string type);
 };
 
 #endif

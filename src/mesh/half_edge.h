@@ -1,3 +1,6 @@
+#ifndef __HALF_EDGE__
+#define __HALF_EDGE__
+
 #include <Eigen/Dense>
 #include <vector>
 #include "mesh.h"
@@ -48,3 +51,5 @@ public:
     // Gaussian Curvature
     void computeGaussianCurvature();
 };
+
+#endif

@@ -4,7 +4,7 @@
 std::unique_ptr<Shader> meshShader;
 
 void Renderer::init() {
-    meshShader = std::make_unique<Shader>("C:\\Users\\gony4\\source\\repos\\MeshEngine\\shaders\\curvature.vert", "C:\\Users\\gony4\\source\\repos\\MeshEngine\\shaders\\curvature.frag");
+    meshShader = std::make_unique<Shader>("shaders\\curvature.vert", "shaders\\curvature.frag");
 
     glEnable(GL_DEPTH_TEST);
 }
@@ -20,16 +20,15 @@ void Renderer::uploadMesh(const Mesh& mesh)
     }
 
     glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-
     glBindVertexArray(VAO);
 
     // 1. Vertex Buffer
+    glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, mesh.vertices.size() * sizeof(Vertex), mesh.vertices.data(), GL_STATIC_DRAW);
 
     // 2. Index Buffer
+    glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(uint32_t), mesh.indices.data(), GL_STATIC_DRAW);
 
@@ -74,7 +73,7 @@ void Renderer::draw(int width, int height)
     meshShader->setMat4("MV", MV);
     meshShader->setMat3("normalMatrix", normalMatrix);
     meshShader->setBool("wireframe", wireframe);
-    meshShader->setBool("useColor", useColor); // ��� ��� ���
+    meshShader->setBool("useColor", useColor);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);

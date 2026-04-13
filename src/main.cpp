@@ -1,26 +1,16 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "common.h"
 #include <iostream>
 
 #include "mesh/obj_loader.h"
 #include "viewer/renderer.h"
 #include "mesh/half_edge.h"
+#include "input_callback.h"
 
-Renderer* gRenderer = nullptr;
+std::string objFilePath = "C:\\Users\\gony4\\source\\repos\\MeshEngine\\assets\\mesh\\teapot.obj";
 
 double lastX = 0;
 double lastY = 0;
 bool dragging = false;
-
-std::string objFilePath = "C:\\Users\\gony4\\source\\repos\\MeshEngine\\assets\\mesh\\teapot.obj";
-
-Mesh mesh;
-HEMesh hemesh;
-
-void mouseButton(GLFWwindow* window, int button, int action, int mods);
-void cursorPos(GLFWwindow* window, double x, double y);
-void scroll(GLFWwindow* window, double xoffset, double yoffset);
-void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 void centerMesh(Mesh& mesh);
 
@@ -49,7 +39,7 @@ int main()
     // -----------------------
     // Mesh load
     // -----------------------
-
+    Mesh mesh;
     LoadOBJ(objFilePath, mesh);
 
     std::cout << "Vertices: " << mesh.vertices.size() << std::endl;
@@ -58,6 +48,7 @@ int main()
     // -----------------------
     // Half Edge mesh
     // -----------------------
+    HEMesh hemesh;
     hemesh.buildFromMesh(mesh);
     hemesh.updateVertexNormals();
     mesh = hemesh.toMesh();
@@ -75,16 +66,17 @@ int main()
     renderer.init();
     renderer.uploadMesh(mesh);
 
-    gRenderer = &renderer;
-
     // -----------------------
     // Input callbacks
     // -----------------------
+    InputCallback inputHandler(&renderer, &hemesh, &mesh);
 
-    glfwSetMouseButtonCallback(window, mouseButton);
-    glfwSetCursorPosCallback(window, cursorPos);
-    glfwSetScrollCallback(window, scroll);
-    glfwSetKeyCallback(window, keyCallback);
+    glfwSetWindowUserPointer(window, &inputHandler);
+
+    glfwSetMouseButtonCallback(window, InputCallback::mouseButtonCallback);
+    glfwSetCursorPosCallback(window, InputCallback::cursorPosCallback);
+    glfwSetScrollCallback(window, InputCallback::scrollCallback);
+    glfwSetKeyCallback(window, InputCallback::keyCallback);
 
     // -----------------------
     // Render loop
@@ -107,92 +99,6 @@ int main()
     return 0;
 }
 
-void mouseButton(GLFWwindow* window, int button, int action, int mods)
-{
-    if (button == GLFW_MOUSE_BUTTON_LEFT)
-    {
-        if (action == GLFW_PRESS)
-        {
-            dragging = true;
-            glfwGetCursorPos(window, &lastX, &lastY);
-        }
-        else if (action == GLFW_RELEASE)
-        {
-            dragging = false;
-        }
-    }
-}
-
-void cursorPos(GLFWwindow* window, double x, double y)
-{
-    if (!dragging)
-        return;
-
-    float dx = x - lastX;
-    float dy = y - lastY;
-
-    float sensitivity = 0.005f;
-
-    gRenderer->camera.yaw += dx * sensitivity;
-    gRenderer->camera.pitch += dy * sensitivity;
-
-    if (gRenderer->camera.pitch > 1.5f)
-        gRenderer->camera.pitch = 1.5f;
-
-    if (gRenderer->camera.pitch < -1.5f)
-        gRenderer->camera.pitch = -1.5f;
-
-    lastX = x;
-    lastY = y;
-}
-
-void scroll(GLFWwindow* window, double xoffset, double yoffset)
-{
-    gRenderer->camera.distance -= yoffset * 0.5f;
-
-    if (gRenderer->camera.distance < 1.0f)
-        gRenderer->camera.distance = 1.0f;
-}
-
-void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-    if (action == GLFW_PRESS)
-    {
-        if (key == GLFW_KEY_W) {
-            // wireframe togle
-            gRenderer->wireframe = !gRenderer->wireframe;
-        }
-        else if (key == GLFW_KEY_S) {
-            // smoothing
-            hemesh.smoothLaplacian(0.1f, 1);
-            mesh = hemesh.toMesh();
-            centerMesh(mesh);
-            gRenderer->uploadMesh(mesh);
-        }
-        else if (key == GLFW_KEY_T) {
-            hemesh.smoothTaubin(0.1f, -0.11f, 1);
-            mesh = hemesh.toMesh();
-            centerMesh(mesh);
-            gRenderer->uploadMesh(mesh);
-        }
-        else if (key == GLFW_KEY_A) {
-            hemesh.smoothAdaptive(1.0f, 10.0f);
-            mesh = hemesh.toMesh();
-            centerMesh(mesh);
-            gRenderer->uploadMesh(mesh);
-        }
-        else if (key == GLFW_KEY_C) {
-            // toggle
-            gRenderer->useColor = !gRenderer->useColor;
-            if (gRenderer->useColor) {
-                hemesh.computeGaussianCurvature();
-                mesh = hemesh.toMesh();
-                centerMesh(mesh);
-                gRenderer->uploadMesh(mesh);
-            }
-        }
-    }
-}
 
 void centerMesh(Mesh& mesh) {
     if (mesh.vertices.empty()) return;

@@ -30,6 +30,7 @@ add_executable (MeshEngine
 "src/mesh/half_edge.h" "src/mesh/half_edge.cpp"
 "src/viewer/shader.h" "src/viewer/shader.cpp"
 "src/common.h" "src/common.cpp"
+"src/input_callback.h" "src/input_callback.cpp"
 )
 
 add_library(imgui

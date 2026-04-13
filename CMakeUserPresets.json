@@ -26,7 +26,7 @@
     {
       "hidden": true,
       "name": "Qt-Default",
-      "inherits": null,
+      "inherits": [],
       "vendor": {
         "qt-project.org/Default": {
           "checksum": "VoalogTkyWuFomeO1TLFx0olLJ4="

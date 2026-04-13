@@ -54,7 +54,7 @@ void Shader::setVec3(const std::string& name, const Eigen::Vector3f& vec) const 
     glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, vec.data());
 }
 
-void Shader::checkCompileErrors(unsigned int shader, std::string type) {
+void Shader::checkCompileErrors(uint32_t shader, std::string type) {
     int success;
     char infoLog[1024];
     if (type != "PROGRAM") {

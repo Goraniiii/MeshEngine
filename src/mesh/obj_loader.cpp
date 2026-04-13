@@ -28,7 +28,7 @@ bool LoadOBJ(const std::string& filename, Mesh& mesh)
 
     if (!ret) return false;
 
-    std::unordered_map<int, unsigned int> uniqueVertices;
+    std::unordered_map<int32_t, uint32_t> uniqueVertices;
 
     for (const auto& shape : shapes)
     {
@@ -36,7 +36,6 @@ bool LoadOBJ(const std::string& filename, Mesh& mesh)
         {
             if (uniqueVertices.find(index.vertex_index) == uniqueVertices.end())
             {
-                // ó�� ���� �����̸� �߰�
                 Eigen::Vector3f position(
                     attrib.vertices[3 * index.vertex_index + 0],
                     attrib.vertices[3 * index.vertex_index + 1],
@@ -53,7 +52,7 @@ bool LoadOBJ(const std::string& filename, Mesh& mesh)
                     );
                 }
 
-                uniqueVertices[index.vertex_index] = (unsigned int)mesh.vertices.size();
+                uniqueVertices[index.vertex_index] = (uint32_t)mesh.vertices.size();
                 mesh.vertices.emplace_back(position, normal);
             }
 

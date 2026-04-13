@@ -1,6 +1,7 @@
 // src/common.cpp
 
 #include "common.h"
+
 #include <fstream>
 #include <sstream>
 
