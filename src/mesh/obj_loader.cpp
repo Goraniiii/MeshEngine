@@ -36,7 +36,7 @@ bool LoadOBJ(const std::string& filename, Mesh& mesh)
         {
             if (uniqueVertices.find(index.vertex_index) == uniqueVertices.end())
             {
-                // Ã³À½ º¸´Â Á¤Á¡ÀÌ¸é Ãß°¡
+                // Ã³ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ì¸ï¿½ ï¿½ß°ï¿½
                 Eigen::Vector3f position(
                     attrib.vertices[3 * index.vertex_index + 0],
                     attrib.vertices[3 * index.vertex_index + 1],
@@ -57,7 +57,6 @@ bool LoadOBJ(const std::string& filename, Mesh& mesh)
                 mesh.vertices.emplace_back(position, normal);
             }
 
-            // ¸Ê¿¡ ÀúÀåµÈ ÀÎµ¦½º »ç¿ë
             mesh.indices.push_back(uniqueVertices[index.vertex_index]);
         }
     }

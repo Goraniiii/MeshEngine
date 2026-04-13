@@ -23,18 +23,13 @@ target_include_directories(glad PUBLIC
 # 이 프로젝트의 실행 파일에 소스를 추가합니다.
 add_executable (MeshEngine   
 "src/main.cpp" 
-"src/viewer/renderer.cpp" 
-"src/viewer/renderer.h" 
-"src/mesh/mesh.h" 
-"src/mesh/obj_loader.h" 
-"src/mesh/obj_loader.cpp"
-"src/viewer/camera.h"
-"src/viewer/camera.cpp"
-"src/mesh/mesh.cpp" 
-"src/mesh/half_edge.h"
-"src/mesh/half_edge.cpp"
-"src/viewer/shader.h"
-"src/viewer/shader.cpp"
+"src/viewer/renderer.h" "src/viewer/renderer.cpp" 
+"src/mesh/mesh.h" "src/mesh/mesh.cpp" 
+"src/mesh/obj_loader.h" "src/mesh/obj_loader.cpp"
+"src/viewer/camera.h" "src/viewer/camera.cpp"
+"src/mesh/half_edge.h" "src/mesh/half_edge.cpp"
+"src/viewer/shader.h" "src/viewer/shader.cpp"
+"src/common.h" "src/common.cpp"
 )
 
 add_library(imgui

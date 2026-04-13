@@ -1,6 +1,8 @@
 #ifndef SHADER_H
 #define SHADER_H
 
+#include "../common.h"
+
 #include <glad/glad.h>
 
 #include <Eigen/Dense>
@@ -11,7 +13,7 @@
 
 class Shader {
 public:
-    unsigned int ID;
+    uint32_t ID;
 
     Shader(const char* vertexPath, const char* fragmentPath);
 

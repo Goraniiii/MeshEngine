@@ -12,6 +12,8 @@ double lastX = 0;
 double lastY = 0;
 bool dragging = false;
 
+std::string objFilePath = "C:\\Users\\gony4\\source\\repos\\MeshEngine\\assets\\mesh\\teapot.obj";
+
 Mesh mesh;
 HEMesh hemesh;
 
@@ -24,16 +26,14 @@ void centerMesh(Mesh& mesh);
 
 int main()
 {
-    if (!glfwInit())
-    {
+    if (!glfwInit()) {
         std::cout << "GLFW init failed\n";
         return -1;
     }
 
     GLFWwindow* window = glfwCreateWindow(800, 600, "MeshEngine", NULL, NULL);
 
-    if (!window)
-    {
+    if (!window) {
         std::cout << "Window creation failed\n";
         glfwTerminate();
         return -1;
@@ -41,8 +41,7 @@ int main()
 
     glfwMakeContextCurrent(window);
 
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cout << "GLAD init failed\n";
         return -1;
     }
@@ -51,10 +50,7 @@ int main()
     // Mesh load
     // -----------------------
 
-    LoadOBJ(
-        "C:\\Users\\gony4\\source\\repos\\MeshEngine\\assets\\mesh\\teapot.obj",
-        mesh
-    );
+    LoadOBJ(objFilePath, mesh);
 
     std::cout << "Vertices: " << mesh.vertices.size() << std::endl;
     std::cout << "Indices: " << mesh.indices.size() << std::endl;
@@ -65,8 +61,6 @@ int main()
     hemesh.buildFromMesh(mesh);
     hemesh.updateVertexNormals();
     mesh = hemesh.toMesh();
-
-    //hemesh.traverseNeighbors(100);
 
     // -----------------------
     // Center mesh

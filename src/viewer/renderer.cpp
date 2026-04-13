@@ -11,9 +11,8 @@ void Renderer::init() {
 
 void Renderer::uploadMesh(const Mesh& mesh)
 {
-    indexCount = (unsigned int)mesh.indices.size();
+    indexCount = (uint32_t)mesh.indices.size();
 
-    // ±âÁ¸ VAO/VBO/EBO ÇØÁ¦
     if (VAO != 0) {
         glDeleteVertexArrays(1, &VAO);
         glDeleteBuffers(1, &VBO);
@@ -32,9 +31,9 @@ void Renderer::uploadMesh(const Mesh& mesh)
 
     // 2. Index Buffer
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned int), mesh.indices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(uint32_t), mesh.indices.data(), GL_STATIC_DRAW);
 
-    // 3. Attribute ¼³Á¤
+    // 3. Attribute
     // Position (Location 0)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
     glEnableVertexAttribArray(0);
@@ -43,7 +42,7 @@ void Renderer::uploadMesh(const Mesh& mesh)
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
     glEnableVertexAttribArray(1);
 
-    // Color (Location 2) - for curvature
+    // Color (Location 2)
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
     glEnableVertexAttribArray(2);
 
@@ -70,12 +69,12 @@ void Renderer::draw(int width, int height)
     Eigen::Matrix4f MVP = proj * view;
     Eigen::Matrix3f normalMatrix = MV.block<3, 3>(0, 0).inverse().transpose();
 
-    // Shader Å¬·¡½ºÀÇ À¯Æ¿¸®Æ¼ ÇÔ¼ö¸¦ »ç¿ëÇÏ¿© À¯´ÏÆû ¼³Á¤
+    // Shader
     meshShader->setMat4("MVP", MVP);
     meshShader->setMat4("MV", MV);
     meshShader->setMat3("normalMatrix", normalMatrix);
     meshShader->setBool("wireframe", wireframe);
-    meshShader->setBool("useColor", useColor); // °î·ü ¸ðµå Åä±Û
+    meshShader->setBool("useColor", useColor); // ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
