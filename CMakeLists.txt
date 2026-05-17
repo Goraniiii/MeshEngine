@@ -1,69 +1,164 @@
-﻿cmake_minimum_required (VERSION 3.10)
+﻿cmake_minimum_required(VERSION 3.16)
 
-if (POLICY CMP0141)
-  cmake_policy(SET CMP0141 NEW)
-    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
-    endif()
+project(MeshEngine)
 
-    project ("MeshEngine")
+# =========================
+# C++ Settings
+# =========================
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_subdirectory(third_party/glfw)
+# =========================
+# Qt Auto Settings
+# =========================
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
+
+# =========================
+# Find Qt6
+# =========================
+
+set(CMAKE_PREFIX_PATH
+    "C:/Qt/6.11.1/msvc2022_64"
+)
+
+find_package(Qt6 REQUIRED COMPONENTS
+    Widgets
+    OpenGL
+    OpenGLWidgets
+)
+
+# =========================
+# GLAD
+# =========================
 
 add_library(glad
-    third_party/glad/src/glad.c)
+    third_party/glad/src/glad.c
+)
 
 target_include_directories(glad PUBLIC
+    src
+    
     third_party/glad/include
 )
 
-# 이 프로젝트의 실행 파일에 소스를 추가합니다.
-add_executable (MeshEngine   
-"src/main.cpp" 
-"src/viewer/renderer.h" "src/viewer/renderer.cpp" 
-"src/mesh/mesh.h" "src/mesh/mesh.cpp" 
-"src/mesh/obj_loader.h" "src/mesh/obj_loader.cpp"
-"src/viewer/camera.h" "src/viewer/camera.cpp"
-"src/mesh/half_edge.h" "src/mesh/half_edge.cpp"
-"src/viewer/shader.h" "src/viewer/shader.cpp"
-"src/common.h" "src/common.cpp"
-"src/input_callback.h" "src/input_callback.cpp"
-)
+# =========================
+# Executable
+# =========================
 
-add_library(imgui
-    third_party/imgui/imgui.cpp
-    third_party/imgui/imgui_draw.cpp
-    third_party/imgui/imgui_tables.cpp
-    third_party/imgui/imgui_widgets.cpp
-    third_party/imgui/backends/imgui_impl_glfw.cpp
-    third_party/imgui/backends/imgui_impl_opengl3.cpp
-)
+qt_add_executable(MeshEngine
 
-target_include_directories(imgui PUBLIC
-    third_party/imgui
-    third_party/imgui/backends
-)
+    # Main
+    src/main.cpp
 
-target_link_libraries(imgui PUBLIC glfw)
+    # Qt Window
+    src/ui/main_window.h
+    src/ui/main_window.cpp
+
+    # OpenGL Widget
+    src/viewer/gl_widget.h
+    src/viewer/gl_widget.cpp
+
+    # Renderer
+    src/viewer/renderer.h
+    src/viewer/renderer.cpp
+
+    # Camera
+    src/viewer/camera.h
+    src/viewer/camera.cpp
+
+    # Shader
+    src/viewer/shader.h
+    src/viewer/shader.cpp
+
+    # Mesh
+    src/mesh/mesh.h
+    src/mesh/mesh.cpp
+
+    # Half Edge
+    src/mesh/half_edge.h
+    src/mesh/half_edge.cpp
+
+    # OBJ Loader
+    src/mesh/obj_loader.h
+    src/mesh/obj_loader.cpp
+
+    # Common
+    src/common.h
+    src/common.cpp
+
+    # Scene
+    src/core/scene.h
+    src/core/scene.cpp
+
+    # Main Window
+    src/ui/main_window.h
+    src/ui/main_window.cpp
+
+    # GL Widget
+    src/viewer/gl_widget.h
+    src/viewer/gl_widget.cpp
+    )
+
+# =========================
+# Include Directories
+# =========================
 
 target_include_directories(MeshEngine PRIVATE
+
+    # GLAD
     third_party/glad/include
+
+    # tinyobjloader
     third_party/tinyobjloader
+
+    # Eigen
     third_party/eigen
-    third_party/imgui
-    third_party/imgui/backends
 )
 
+# =========================
+# Link Libraries
+# =========================
 
-target_link_libraries(MeshEngine
-    glfw
+target_link_libraries(MeshEngine PRIVATE
+
+    # OpenGL Loader
     glad
-    imgui
+
+    # Qt
+    Qt6::Widgets
+    Qt6::OpenGL
+    Qt6::OpenGLWidgets
+
+    # Windows OpenGL
     opengl32
 )
 
-file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/shaders" 
-     DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+# =========================
+# Shader Copy
+# =========================
+
+file(COPY
+    "${CMAKE_CURRENT_SOURCE_DIR}/shaders"
+    DESTINATION
+    "${CMAKE_CURRENT_BINARY_DIR}"
+)
+
+add_custom_command(TARGET MeshEngine POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/shaders
+    $<TARGET_FILE_DIR:MeshEngine>/shaders
+)
+
+# =========================
+# MSVC UTF-8
+# =========================
+
+if (MSVC)
+    target_compile_options(MeshEngine PRIVATE /utf-8)
+endif()
+

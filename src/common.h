@@ -6,7 +6,6 @@
 #include <optional>
 
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
 std::optional<std::string> LoadTextFile(const std::string& filename);
 
